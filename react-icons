@@ -1,0 +1,91 @@
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Box, Button, Heading, Text, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, IconButton } from "@chakra-ui/react";
+import { FaCog, FaTrophy } from "react-icons/fa";
+import useGameLogic from "./hooks/useGameLogic";
+import Background from "./components/Background";
+import Spaceship from "./components/Spaceship";
+import Enemy from "./components/Enemy";
+import Bullet from "./components/Bullet";
+import Explosion from "./components/Explosion";
+import PowerUp from "./components/PowerUp";
+import useAudio from "./hooks/useAudio";
+import LeaderboardModal from "./components/LeaderboardModal";
+import SettingsModal from "./components/SettingsModal";
+
+export default function KioSpaceOdyssey() {
+  const { isGameOver, score, spaceshipPosition, enemies, bullets, explosions, powerUps, handleKeyDown, restartGame } = useGameLogic();
+
+  const { playSoundEffect, playBackgroundMusic, stopBackgroundMusic } = useAudio();
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const handleToggleLeaderboard = () => {
+    setIsLeaderboardOpen(!isLeaderboardOpen);
+  };
+
+  const handleToggleSettings = () => {
+    setIsSettingsOpen(!isSettingsOpen);
+  };
+
+  return (
+    <Box onKeyDown={handleKeyDown} tabIndex="0" className="game-container" outline="none">
+      <Background />
+      <AnimatePresence>
+        {isGameOver && (
+          <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="game-over-modal">
+            <Heading size="lg">Game Over</Heading>
+            <Text>Score: {score}</Text>
+            <Button onClick={restartGame}>Restart</Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <Spaceship position={spaceshipPosition} />
+      {enemies.map((enemy) => (
+        <Enemy key={enemy.id} {...enemy} />
+      ))}
+      {bullets.map((bullet) => (
+        <Bullet key={bullet.id} {...bullet} />
+      ))}
+      {explosions.map((explosion) => (
+        <Explosion key={explosion.id} {...explosion} onComplete={() => playSoundEffect("explosion")} />
+      ))}
+      {powerUps.map((powerUp) => (
+        <PowerUp key={powerUp.id} {...powerUp} />
+      ))}
+      <Box className="game-ui">
+        <Text className="score">Score: {score}</Text>
+        <IconButton icon={<FaTrophy />} aria-label="Leaderboard" onClick={handleToggleLeaderboard} />
+        <IconButton icon={<FaCog />} aria-label="Settings" onClick={handleToggleSettings} />
+      </Box>
+      <AnimatePresence>
+        {isLeaderboardOpen && (
+          <Modal isOpen={isLeaderboardOpen} onClose={handleToggleLeaderboard}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Leaderboard</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <LeaderboardModal onClose={handleToggleLeaderboard} />
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <Modal isOpen={isSettingsOpen} onClose={handleToggleSettings}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Settings</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <SettingsModal onClose={handleToggleSettings} onMusicToggle={playBackgroundMusic} onMusicStop={stopBackgroundMusic} />
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+        )}
+      </AnimatePresence>
+    </Box>
+  );
+}
