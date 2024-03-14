@@ -1,15 +1,19 @@
-// Complete the Index page component here
-// Use chakra-ui
-import { Button } from "@chakra-ui/react"; // example
-import { FaPlus } from "react-icons/fa"; // example - use react-icons/fa for icons
+import { Box, Heading, Text, Button } from "@chakra-ui/react";
+import { FaArrowRight } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Index = () => {
-  // TODO: Create the website here!
   return (
-    <Button>
-      Hello world! <FaPlus />
-    </Button>
-  ); // example
+    <Box maxW="container.lg" mx="auto" mt={8} textAlign="center">
+      <Heading as="h1" mb={4}>
+        Welcome to My Website
+      </Heading>
+      <Text mb={8}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nulla sit amet aliquam lacinia, nisl nisl aliquam nisl, nec aliquam nisl nisl sit amet nisl.</Text>
+      <Button as={Link} to="/services" colorScheme="blue" rightIcon={<FaArrowRight />}>
+        View Our Services
+      </Button>
+    </Box>
+  );
 };
 
 export default Index;
